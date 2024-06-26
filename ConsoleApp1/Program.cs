@@ -51,9 +51,11 @@ namespace ConsoleApp1
         }
 
 
-        static void LogIn()
+        static bool LogIn()
         {
+            bool a = false;
             bool w = true;
+            int iloscprob = 0;
             while (w)
             {
                 Console.Write("Podaj login: ");
@@ -61,18 +63,31 @@ namespace ConsoleApp1
                 Console.Write("Podaj haslo: ");
                 var Haslo = Console.ReadLine();
                 var acc = Accounts.Where(x => x.Login == login && x.Password == Haslo).FirstOrDefault();
+                var possiblelogin = Accounts.Where(x => x.Login == login).FirstOrDefault();
+                
                 if (acc != null)
                 {
                     w = false;
-                    Console.WriteLine("AAAAAAAA");
+                    Console.Clear();
+                    Console.WriteLine("Pomyślnie zalogowano!:)");
+                    a = true;
 
                 }
                 else {
                     Console.Clear();
                     Console.WriteLine("Błędne hasło lub login!");
-
+                    a = false;
+                    iloscprob++;
+                    if (possiblelogin.BlockTime > DateTime.Now) {
+                        Console.WriteLine($"Twoje konto jest zablokowane do: {possiblelogin.BlockTime.ToString()}");
+                    }
+                    if (iloscprob == 3) {
+                        possiblelogin.BlockTime = new DateTime(2024, 6, 26, 19, 30, 0);
+                        
+                    }
                 }
             }
+            return a;
 
             //bool IsUser = false;    
             //foreach (var account in Accounts) {

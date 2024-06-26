@@ -14,6 +14,7 @@ namespace ConsoleApp1
         public string Email { get; set; }
         public bool IsAdmin { get; set; }
         public bool IsActive {  get; set; }
+        public DateTime BlockTime { get; set; }
         public Account(string login, string password) { 
             Login = login;
             Password = password;
