@@ -48,6 +48,7 @@ namespace ConsoleApp1
             }
             var account = new Account(login, haslo);
             Accounts.Add(account);
+            Console.Clear();
         }
 
 
@@ -81,10 +82,15 @@ namespace ConsoleApp1
                     if (possiblelogin.BlockTime > DateTime.Now) {
                         Console.WriteLine($"Twoje konto jest zablokowane do: {possiblelogin.BlockTime.ToString()}");
                     }
-                    if (iloscprob == 3) {
-                        possiblelogin.BlockTime = new DateTime(2024, 6, 26, 19, 30, 0);
-                        
+                    if (iloscprob == 3)
+                    {
+                        possiblelogin.BlockTime = DateTime.Now.AddMinutes(10);
+
                     }
+                    //if (iloscprob == 3) {
+                    //    possiblelogin.BlockTime = new DateTime(2024, 6, 26, 19, 30, 0);
+
+                    //}
                 }
             }
             return a;
