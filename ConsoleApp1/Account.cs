@@ -11,7 +11,6 @@ namespace ConsoleApp1
         public long Id { get; set; }
         public string Login { get; set; }
         public string Password { get; set; }
-        public string Email { get; set; }
         public bool IsAdmin { get; set; }
         public bool IsActive {  get; set; }
         public DateTime BlockTime { get; set; }
@@ -21,5 +20,6 @@ namespace ConsoleApp1
             IsActive = true;
             IsAdmin = false;
         }
+        public Account() { }
     }
 }

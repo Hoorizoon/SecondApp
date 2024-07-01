@@ -1,10 +1,10 @@
-﻿using System.ComponentModel;
+﻿using System.Security.Principal;
 
 namespace ConsoleApp1
 {
     internal class Program
     {
-        private static List<Account> Accounts = new List<Account>();
+
         static void Main(string[] args)
         {
             while (true)
@@ -17,6 +17,7 @@ namespace ConsoleApp1
                 {
                     case 1:
                         LogIn();
+                        
                         break;
                     case 2:
                         CreateUser();
@@ -47,13 +48,14 @@ namespace ConsoleApp1
                 }
             }
             var account = new Account(login, haslo);
-            Accounts.Add(account);
+            //Accounts.Add(account);
+            SaveAcc(account);
             Console.Clear();
         }
 
 
         static bool LogIn()
-        {
+        {   
             bool a = false;
             bool w = true;
             int iloscprob = 0;
@@ -63,47 +65,97 @@ namespace ConsoleApp1
                 var login = Console.ReadLine();
                 Console.Write("Podaj haslo: ");
                 var Haslo = Console.ReadLine();
-                var acc = Accounts.Where(x => x.Login == login && x.Password == Haslo).FirstOrDefault();
-                var possiblelogin = Accounts.Where(x => x.Login == login).FirstOrDefault();
-                
-                if (acc != null)
+                var acc = LoadAcc().Where(x => x.Login == login && x.Password == Haslo).FirstOrDefault();
+                var possiblelogin = LoadAcc().Where(x => x.Login == login).FirstOrDefault();
+
+                if (possiblelogin != null)
                 {
-                    w = false;
-                    Console.Clear();
-                    Console.WriteLine("Pomyślnie zalogowano!:)");
-                    a = true;
 
-                }
-                else {
-                    Console.Clear();
-                    Console.WriteLine("Błędne hasło lub login!");
-                    a = false;
-                    iloscprob++;
-                    if (possiblelogin.BlockTime > DateTime.Now) {
-                        Console.WriteLine($"Twoje konto jest zablokowane do: {possiblelogin.BlockTime.ToString()}");
-                    }
-                    if (iloscprob == 3)
+                    if (acc != null)
                     {
-                        possiblelogin.BlockTime = DateTime.Now.AddMinutes(10);
+                        w = false;
+                        Console.Clear();
+                        Console.WriteLine("Pomyślnie zalogowano!:)");
+                        a = true;
 
                     }
-                    //if (iloscprob == 3) {
-                    //    possiblelogin.BlockTime = new DateTime(2024, 6, 26, 19, 30, 0);
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Błędne hasło lub login!");
+                        a = false;
+                        iloscprob++;
+                        if (possiblelogin.BlockTime > DateTime.Now)
+                        {
+                            Console.WriteLine($"Twoje konto jest zablokowane do: {possiblelogin.BlockTime.ToString()}");
+                        }
+                        if (iloscprob == 3)
+                        {
+                            possiblelogin.BlockTime = DateTime.Now.AddMinutes(10);
 
-                    //}
+                        }
+
+                    }
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Błędny login lub hasło!");
                 }
             }
-            return a;
 
-            //bool IsUser = false;    
-            //foreach (var account in Accounts) {
-            //    if (account.Login == login && account.Password == Haslo)
-            //    {
-            //        Console.WriteLine("Pomyślnie zalogowano!:)");
-            //        IsUser = true;
-            //        break;
-            //    }
-            //}
+            return a;
         }
+        public static long MaxInt(List<Account> accounts)
+        {
+            long maxid = 0;
+            foreach (var acc in accounts)
+            {
+                if (maxid < acc.Id)
+                {
+                    maxid = acc.Id;
+                }
+
+            }
+            return maxid++;
+        }
+        public static void SaveAcc(Account account)
+        {
+            string filepath = "C:\\Users\\PC\\Desktop\\Programowanie\\ConsoleApp2\\ConsoleApp1\\Acc.txt";
+            var sw = new StreamWriter(filepath);
+            string konto = MaxInt(LoadAcc()) + "|" + account.Login + "|" + account.Password + "|" +
+                account.IsAdmin + "|" + account.IsActive + "|" + account.BlockTime;
+            sw.WriteLine(konto);
+            sw.Close();
+        }
+        public static List<Account> LoadAcc() 
+        {
+            string filepath = "C:\\Users\\PC\\Desktop\\Programowanie\\ConsoleApp2\\ConsoleApp1\\Acc.txt";
+            List<Account> acc = new List<Account>();
+            using (var sr = new StreamReader(filepath))
+            {
+                
+                string line = "";
+                while ((line = sr.ReadLine()) != null)
+                {
+                    acc.Add(GetAccount(line));
+                }
+                
+            }
+            return acc;
+        }
+        public static Account GetAccount(string line)
+        {
+            var elements = line.Split('|');
+            var Account = new Account();
+            Account.Id = Convert.ToInt64(elements[0]);
+            Account.Login = (elements[1]);
+            Account.Password = (elements[2]);
+            Account.IsAdmin = Convert.ToBoolean(elements[3]);
+            Account.IsActive = Convert.ToBoolean(elements[4]);
+            Account.BlockTime = Convert.ToDateTime(elements[5]);
+            return Account;
+        }
+        
     }
 }
